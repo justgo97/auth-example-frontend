@@ -13,6 +13,8 @@ const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const [isFetching, setIsFetching] = useState(false);
+
   const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
   };
@@ -28,11 +30,14 @@ const RegisterForm = () => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isFetching) return;
+
     if (!name || !email || !password) {
       return;
     }
 
     const fetchLogin = async () => {
+      setIsFetching(true);
       const result = await sendRegister(name, email, password);
 
       if (result.success) {
@@ -41,6 +46,7 @@ const RegisterForm = () => {
       } else if (result.errorMessage) {
         setError(result.errorMessage);
       }
+      setIsFetching(false);
     };
 
     fetchLogin();
@@ -89,7 +95,7 @@ const RegisterForm = () => {
       <p>
         Already have an account? sign in from <Link to="/login">here</Link>.
       </p>
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn btn-primary" disabled={isFetching}>
         Sign Up
       </button>
       {error && <div className="text-danger">{error}</div>}

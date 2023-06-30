@@ -11,6 +11,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
 
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -23,7 +24,10 @@ const LoginForm = () => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isFetching) return;
+
     const fetchLogin = async () => {
+      setIsFetching(true);
       const result = await sendLogin(email, password);
 
       if (result.success) {
@@ -32,6 +36,7 @@ const LoginForm = () => {
       } else if (result.errorMessage) {
         setError(result.errorMessage);
       }
+      setIsFetching(false);
     };
 
     fetchLogin();
@@ -64,17 +69,10 @@ const LoginForm = () => {
           onChange={onChangePassword}
         />
       </div>
-      <div className="mb-3 form-check">
-        <input
-          type="checkbox"
-          className="form-check-input"
-          id="exampleCheck1"
-        />
-        <p>
-          Don't have an account? sign up from <Link to="/register">here</Link>.
-        </p>
-      </div>
-      <button type="submit" className="btn btn-primary">
+      <p>
+        Don't have an account? sign up from <Link to="/register">here</Link>.
+      </p>
+      <button type="submit" className="btn btn-primary" disabled={isFetching}>
         Submit
       </button>
       {error && <div className="text-danger">{error}</div>}
